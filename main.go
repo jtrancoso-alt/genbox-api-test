@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 )
@@ -22,12 +23,27 @@ func verifyOrigin(next http.Handler) http.Handler {
 	})
 }
 
+type Response struct {
+	Message string `json:"message"`
+}
+
 // Controlador del endpoint protegido
 func protectedEndpoint(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte("¡Endpoint protegido alcanzado con éxito!"))
+
+	response := Response{
+		Message: "Protected endpoint reached successfully!",
+	}
+	jsonResponse, err := json.Marshal(response)
 	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	// Set Content-Type header to application/json
+	w.Header().Set("Content-Type", "application/json")
+
+	// Write response
+	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResponse)
 }
 
 func main() {
