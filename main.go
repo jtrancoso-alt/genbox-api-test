@@ -52,7 +52,10 @@ func protectedEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	// Write response
 	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+	_, err = w.Write(jsonResponse)
+	if err != nil {
+		return
+	}
 }
 
 func main() {
